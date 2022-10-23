@@ -93,6 +93,8 @@ def plot_losses(accs):
     # for lr in losses:
     plt.plot(accs[:, 0], accs[:, 1], label=f"Train Acc")
     plt.plot(accs[:, 0], accs[:, 2], label="Val Acc")
+    plt.ylabel("Accuracy")
+    plt.xlabel("Lambda")
     plt.legend()
     plt.show()
     plt.savefig("losses_graph.png")
@@ -100,13 +102,13 @@ def plot_losses(accs):
     accs_df.to_csv("accuracies.csv", index=False)
     return
 
-def plot_sparsity(all_weights, lambds):
+def plot_sparsity(all_weights, lambds, path):
     sparsities = []
     for i in range(len(lambds)):
         sparsities.append(calc_sparsity(all_weights[i]))
     sparsities_df = pd.DataFrame(sparsities, index=lambds, columns=["sparsity"])
     sparsities_df.index.name = "lambda"
-    sparsities_df.to_csv("sparcities.csv")
+    sparsities_df.to_csv(path)
     return
 
 def save_weights(labels, all_weights, path):
@@ -114,14 +116,14 @@ def save_weights(labels, all_weights, path):
     weights_df.to_csv(path, index=False)
     return
 
-def save_top_5_features(labels, all_weights, lambds):
+def save_top_5_features(labels, all_weights, lambds, path):
     features = []
     for weights in all_weights:
         top_5_idx = np.argpartition(np.absolute(weights[1:]), -5, axis=0)[-5:]
         features.append(labels[top_5_idx+1])
     features_df = pd.DataFrame(features, index=lambds, columns=["feature_1", "feature_2", "feature_3", "feature_4", "feature_5"])
     features_df.index.name = "lambda"
-    features_df.to_csv("features.csv")
+    features_df.to_csv(path)
     return
 
 # Invoke the above functions to implement the required functionality for each part of the assignment.
@@ -146,9 +148,9 @@ for i in range(len(lambds)):
 
 accs = np.array(accs)
 plot_losses(accs)
-save_weights(norm_train.columns[:-1], all_weights, "weights.csv")
-save_top_5_features(norm_train.columns[:-1], all_weights, lambds)
-plot_sparsity(all_weights, lambds)
+save_weights(norm_train.columns[:-1], all_weights, "weights_p1.csv")
+save_top_5_features(norm_train.columns[:-1], all_weights, lambds, "top_features_p1.csv")
+plot_sparsity(all_weights, lambds, "sparcities_p1.csv")
 
 # Part 2  Training and experimenting with IA2-train-noisy data.
 # Your code here:
