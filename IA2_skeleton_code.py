@@ -117,24 +117,31 @@ def LR_L1_train(train_data, val_data, lr, lambd, max_epoch):
 def plot_losses(accs, acc_png_path, acc_csv_path):
     # Your code here:
     # for lr in losses:
-    plt.plot(accs[:, 0], accs[:, 1], label=f"Train Acc")
-    plt.plot(accs[:, 0], accs[:, 2], label="Val Acc")
+    plt.plot(np.log10(accs[:, 0]), accs[:, 1], label=f"Train Acc")
+    plt.plot(np.log10(accs[:, 0]), accs[:, 2], label="Val Acc")
     plt.ylabel("Accuracy")
-    plt.xlabel("Lambda")
+    plt.xlabel("i for $λ=10^i$")
     plt.legend()
     plt.show()
     plt.savefig(acc_png_path)
+    plt.clf()
     accs_df = pd.DataFrame(accs, columns=["lambda", "train", "val"])
     accs_df.to_csv(acc_csv_path, index=False)
     return
 
-def plot_sparsity(all_weights, lambds, path):
+def plot_sparsity(all_weights, lambds, spars_csv_path, spars_png_path):
     sparsities = []
     for i in range(len(lambds)):
         sparsities.append(calc_sparsity(all_weights[i]))
+    plt.plot(np.log10(lambds), sparsities)
+    plt.ylabel("Sparsity")
+    plt.xlabel("i for $λ=10^i$")
+    plt.show()
+    plt.savefig(spars_png_path)
+    plt.clf()
     sparsities_df = pd.DataFrame(sparsities, index=lambds, columns=["sparsity"])
     sparsities_df.index.name = "lambda"
-    sparsities_df.to_csv(path)
+    sparsities_df.to_csv(spars_csv_path)
     return
 
 def save_weights(labels, all_weights, path):
@@ -216,6 +223,6 @@ accs_l1 = np.array(accs_l1)
 plot_losses(accs_l1, "accuracies_p3.png", "accuracies_p3.csv")
 save_weights(norm_train.columns[:-1], all_weights_l1, "weights_p3.csv")
 save_top_5_features(norm_train.columns[:-1], all_weights_l1, lambds, "top_features_p3.csv")
-plot_sparsity(all_weights_l1, lambds, "sparcities_p3.csv")
+plot_sparsity(all_weights_l1, lambds, "sparcities_p3.csv", "sparcities_p3.png")
 
 
