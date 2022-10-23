@@ -88,7 +88,7 @@ def LR_L1_train(train_data, val_data, lambd):
 
 # Generates and saves plots of the accuracy curves. Note that you can interpret accs as a matrix
 # containing the accuracies of runs with different lambda values and then put multiple loss curves in a single plot.
-def plot_losses(accs):
+def plot_losses(accs, acc_png_path, acc_csv_path):
     # Your code here:
     # for lr in losses:
     plt.plot(accs[:, 0], accs[:, 1], label=f"Train Acc")
@@ -97,9 +97,9 @@ def plot_losses(accs):
     plt.xlabel("Lambda")
     plt.legend()
     plt.show()
-    plt.savefig("losses_graph.png")
+    plt.savefig(acc_png_path)
     accs_df = pd.DataFrame(accs, columns=["lambda", "train", "val"])
-    accs_df.to_csv("accuracies.csv", index=False)
+    accs_df.to_csv(acc_csv_path, index=False)
     return
 
 def plot_sparsity(all_weights, lambds, path):
@@ -135,26 +135,43 @@ norm_train, norm_val = preprocess_data((train_data, val_data))
 
 # Part 1 . Implement logistic regression with L2 regularization and experiment with different lambdas
 # Your code here:
-lambds = [0, 1e-4, 1e-3, 1e-2, 1e-1, 1e-0, 1e1, 1e2]
-lrs = [2.5, 2.5, 2, 2, 1, 0.01, 0.01, 0.01]
-accs = []
-all_weights = []
+# lambds = [0, 1e-4, 1e-3, 1e-2, 1e-1, 1e-0, 1e1, 1e2]
+# lrs = [2.5, 2.5, 2, 2, 1, 0.01, 0.01, 0.01]
+# accs = []
+# all_weights = []
 
-for i in range(len(lambds)):
-    max_epoch = 5000
-    weights, train_acc, val_acc = LR_L2_train(norm_train, norm_val, lrs[i], lambds[i], max_epoch)
-    accs.append([lambds[i], train_acc, val_acc])
-    all_weights.append(weights.flatten())
+# for i in range(len(lambds)):
+#     max_epoch = 5000
+#     weights, train_acc, val_acc = LR_L2_train(norm_train, norm_val, lrs[i], lambds[i], max_epoch)
+#     accs.append([lambds[i], train_acc, val_acc])
+#     all_weights.append(weights.flatten())
 
-accs = np.array(accs)
-plot_losses(accs)
-save_weights(norm_train.columns[:-1], all_weights, "weights_p1.csv")
-save_top_5_features(norm_train.columns[:-1], all_weights, lambds, "top_features_p1.csv")
-plot_sparsity(all_weights, lambds, "sparcities_p1.csv")
+# accs = np.array(accs)
+# plot_losses(accs, "accuracies_p1.png", "accuracies_p1.csv")
+# save_weights(norm_train.columns[:-1], all_weights, "weights_p1.csv")
+# save_top_5_features(norm_train.columns[:-1], all_weights, lambds, "top_features_p1.csv")
+# plot_sparsity(all_weights, lambds, "sparcities_p1.csv")
 
 # Part 2  Training and experimenting with IA2-train-noisy data.
 # Your code here:
+train_noisy_data = load_data('IA2-train-noisy.csv')
+norm_train_noisy, norm_val_noisy = preprocess_data((train_noisy_data, val_data))
+lambds = [0, 1e-4, 1e-3, 1e-2, 1e-1, 1e-0, 1e1, 1e2]
+lrs_noisy = [2.5, 2.5, 2, 2, 1, 0.01, 0.01, 0.01]
+accs_noisy = []
+all_weights_noisy = []
 
+for i in range(len(lambds)):
+    max_epoch = 10
+    weights, train_acc, val_acc = LR_L2_train(norm_train_noisy, norm_val_noisy, lrs_noisy[i], lambds[i], max_epoch)
+    accs_noisy.append([lambds[i], train_acc, val_acc])
+    all_weights_noisy.append(weights.flatten())
+
+accs_noisy = np.array(accs_noisy)
+plot_losses(accs_noisy, "accuracies_p2.png", "accuracies_p2.csv")
+save_weights(norm_train.columns[:-1], all_weights_noisy, "weights_p2.csv")
+save_top_5_features(norm_train.columns[:-1], all_weights_noisy, lambds, "top_features_p2.csv")
+plot_sparsity(all_weights_noisy, lambds, "sparcities_p2.csv")
 
 # Part 3  Implement logistic regression with L1 regularization and experiment with different lambdas
 # Your code here:
